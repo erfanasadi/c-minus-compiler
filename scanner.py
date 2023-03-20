@@ -14,11 +14,14 @@ class TokenType:
     WHITESPACE = 'WHITESPACE'
     ID_OR_KEYWORD = 'ID_OR_KEYWORD'
     INVALID = 'Invalid input'
+    EQUAL = 'EQUAL'
 
 
 def get_token_type(char):
     if char in [' ', '\t', '\n', '\r', '\v', '\f']:  # WHITESPACE
         return TokenType.WHITESPACE
+    # elif char == '=':
+    #     return TokenTyp.EQUAL
     elif char in [';', ':', ',', '[', ']', '(', ')', '{', '}', '+', '-', '*', '=', '<']:  # SYMBOL
         return TokenType.SYMBOL
     elif char.isdigit():  # NUM
@@ -100,7 +103,9 @@ class Scanner:
             self.cursor += 1
             return self.scan_next_token()
         elif token_type == TokenType.SYMBOL:
+            flag = 0
             if char == '*':
+
                 if self.cursor < len(self.lines) - 1 \
                         and self.lines[self.cursor + 1] == '/':
                     self.cursor += 2
@@ -110,6 +115,8 @@ class Scanner:
                         and get_token_type(self.lines[self.cursor + 1]) == TokenType.INVALID:
                     lexical_errors[self.line_number].append("(" + "*" + self.lines[self.cursor + 1] + ", Invalid input)")
                     self.cursor+=1
+                    flag = 1
+
             elif char == '=':
                 if self.cursor < len(self.lines) - 1 and self.lines[self.cursor + 1] == '=':
                     self.cursor += 2
@@ -117,8 +124,11 @@ class Scanner:
                 elif self.cursor < len(self.lines) - 1 and get_token_type(self.lines[self.cursor + 1])==TokenType.INVALID  :
                     lexical_errors[self.line_number].append("(" + "=" + self.lines[self.cursor + 1]+", Invalid input)")
                     self.cursor += 1
+                    flag = 1
+
             self.cursor += 1
-            return self.line_number, TokenType.SYMBOL, char
+            if flag == 0:
+                return self.line_number, TokenType.SYMBOL, char
         elif token_type == TokenType.NUM:
             number, error = self.isNumber()
             if not error:
@@ -231,5 +241,5 @@ class Scanner:
                 self.line_number += 1
             lexeme += temp_char
 
-        self.cursor += 1
+        # self.cursor += 1
         return lexeme, False
