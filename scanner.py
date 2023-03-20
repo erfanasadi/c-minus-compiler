@@ -106,10 +106,17 @@ class Scanner:
                     self.cursor += 2
                     lexical_errors[self.line_number].append("("+"*/"+", Unmatched comment)")
                     return False
+                elif self.cursor < len(self.lines) - 1 \
+                        and get_token_type(self.lines[self.cursor + 1]) == TokenType.INVALID:
+                    lexical_errors[self.line_number].append("(" + "*" + self.lines[self.cursor + 1] + ", Invalid input)")
+                    self.cursor+=1
             elif char == '=':
                 if self.cursor < len(self.lines) - 1 and self.lines[self.cursor + 1] == '=':
                     self.cursor += 2
                     return self.line_number, TokenType.SYMBOL, '=='
+                elif self.cursor < len(self.lines) - 1 and get_token_type(self.lines[self.cursor + 1])==TokenType.INVALID  :
+                    lexical_errors[self.line_number].append("(" + "=" + self.lines[self.cursor + 1]+", Invalid input)")
+                    self.cursor += 1
             self.cursor += 1
             return self.line_number, TokenType.SYMBOL, char
         elif token_type == TokenType.NUM:
@@ -196,8 +203,11 @@ class Scanner:
 
         next_char = self.lines[self.cursor + 1]
         if next_char not in ['*']:
-            lexical_errors[self.line_number].append("("+lexeme+", Invalid input)")
-            self.cursor += 1
+            if get_token_type(next_char)==TokenType.WHITESPACE or get_token_type(next_char)==TokenType.SYMBOL:
+                lexical_errors[self.line_number].append("("+lexeme+", Invalid input)")
+            else:
+                lexical_errors[self.line_number].append("(" + lexeme+next_char+ ", Invalid input)")
+            self.cursor += 2
             return
 
         is_multiline = next_char == '*'
