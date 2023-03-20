@@ -47,6 +47,10 @@ def save_errors():
           print('There is no lexical error.')
     #   f.write('There is no lexical error.')
 
+def save_tokens():
+    with open('tokens.txt', 'w') as f:
+        f.write('\n'.join([f'{line_no + 1}.\t' + ' '.join([f'({token[0]}, {token[1]})' for token in tokens])
+                           for line_no, tokens in tokens.items()]))
 
 class Scanner:
     def __init__(self, input_path):
