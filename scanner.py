@@ -1,8 +1,8 @@
 from collections import defaultdict
+
 symbol_table = dict()
 lexical_errors = defaultdict(list)
 tokens = defaultdict(list)
-
 
 
 class TokenType:
@@ -31,32 +31,53 @@ def get_token_type(char):
         return TokenType.INVALID
 
 
-def save_errors():
-     with open('lexical_errors.txt', 'w') as f:
-        if lexical_errors:
+def init_symbol_table():
+    symbol_table['keywords'] = ['if', 'else', 'void', 'int', 'while', 'break', 'switch',
+                                'default', 'case', 'return', 'for']
+    symbol_table['ids'] = []
 
-            for line_num,line_eror in lexical_errors.items():
-                f.write(f'{line_num+1}.'+"\t")
+
+def isIdOrKeyword(name):
+    for name1 in symbol_table["keywords"]:
+        if (name == name1):
+            return TokenType.KEYWORD
+    else:
+        int
+        flag = 0
+        for name1 in symbol_table['ids']:
+            if (name1 == name):
+                flag = 1
+        if (flag == 0):
+            symbol_table['ids'].append(name)
+        return TokenType.ID
+
+
+def save_errors():
+    with open('lexical_errors.txt', 'w') as f:
+        if lexical_errors:
+            for line_num, line_eror in lexical_errors.items():
+                f.write(f'{line_num + 1}.' + "\t")
                 for i in range(len(line_eror)):
-                    if(i==len(line_eror)-1):
+                    if (i == len(line_eror) - 1):
                         for char in range(len(line_eror[i])):
                             f.write(f'{line_eror[i][char]}')
                         f.write("\n")
                     else:
                         f.write(f'{line_eror[i]} ')
         else:
-          print('There is no lexical error.')
-    #   f.write('There is no lexical error.')
+            f.write('There is no lexical error.')
+
 
 def save_tokens():
     with open('tokens.txt', 'w') as f:
         f.write('\n'.join([f'{line_no + 1}.\t' + ' '.join([f'({token[0]}, {token[1]})' for token in tokens])
                            for line_no, tokens in tokens.items()]))
 
+
 class Scanner:
     def __init__(self, input_path):
         self.input_path = input_path
-        self.selflines = None
+        self.lines = None
 
         self.line_number = 0
         self.cursor = 0
@@ -72,12 +93,31 @@ class Scanner:
             self.cursor += 1
             return self.scan_next_token()
         if token_type == TokenType.NUM:
-            number, error = self.isnumber()
+            number, error = self.isNumber()
             if not error:
                 return self.line_number, TokenType.NUM, number
 
             lexical_errors[self.line_number].append("(" + number + ", Invalid number)")
-
+        elif token_type == TokenType.ID_OR_KEYWORD:
+            name, has_error = self.findIdOrKeyword()
+            if not has_error:
+                return self.line_number, isIdOrKeyword(name), name
+            lexical_errors[self.line_number].append((name, 'Invalid input'))
+        elif token_type == TokenType.SYMBOL:
+            if char == '*':
+                if self.cursor < len(self.lines) - 1 \
+                        and self.lines[self.cursor + 1] == '/':
+                    self.cursor += 2
+                    lexical_errors[self.line_number].append(('*/', 'Unmatched comment'))
+                    return False
+            elif char == '=':
+                if self.cursor < len(self.lines) - 1 and self.lines[self.cursor + 1] == '=':
+                    self.cursor += 2
+                    return self.line_number, TokenType.SYMBOL, '=='
+            self.cursor += 1
+            return self.line_number, TokenType.SYMBOL, char
+        elif token_type == TokenType.COMMENT:
+            self.find_comment()
         else:
             self.cursor += 1
 
@@ -96,9 +136,11 @@ class Scanner:
                 tokens[token[0]].append(token[1:])
 
     def get_current_char(self):
+
         return self.lines[self.cursor]
 
-    def isnumber(self):
+    def isNumber(self):
+
         num = self.get_current_char()
         while self.cursor + 1 < len(self.lines):
             self.cursor += 1
@@ -117,3 +159,23 @@ class Scanner:
 
         self.cursor += 1
         return num, False
+
+    def findIdOrKeyword(self):
+        name = self.get_current_char()
+        while self.cursor + 1 < len(self.lines):
+            self.cursor += 1
+            temp_char = self.get_current_char()
+            temp_type = get_token_type(temp_char)
+
+            if temp_type == TokenType.NUM or temp_type == TokenType.ID_OR_KEYWORD:
+                name += temp_char
+            elif temp_type == TokenType.WHITESPACE or temp_type == TokenType.SYMBOL:
+                return name, False
+            else:
+                name += temp_char
+                self.cursor += 1
+                return name, True
+
+    def find_comment(self):
+        # TODO write this
+            pass
