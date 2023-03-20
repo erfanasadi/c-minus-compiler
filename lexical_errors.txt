@@ -1,2 +1,1 @@
-4.	(2a, Invalid number) (2a, Invalid number)
-7.	(3d, Invalid number)
+There is no lexical error.

@@ -32,8 +32,7 @@ def get_token_type(char):
 
 
 def init_symbol_table():
-    symbol_table['keywords'] = ['if', 'else', 'void', 'int', 'while', 'break', 'switch',
-                                'default', 'case', 'return', 'for']
+    symbol_table['keywords'] = [ 'break','else','if', 'int','repeat' , 'return', 'until','void']
     symbol_table['ids'] = []
 
 
