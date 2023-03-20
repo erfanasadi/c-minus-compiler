@@ -4,6 +4,7 @@ lexical_errors = defaultdict(list)
 tokens = defaultdict(list)
 
 
+
 class TokenType:
     SYMBOL = 'SYMBOL'
     NUM = 'NUM'
