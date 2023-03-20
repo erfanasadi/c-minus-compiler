@@ -1,28 +1,18 @@
-int f(int n){
-return n * n * n;
-}
-
-void main(void){
-int a; int b; int c;
-int num; int cha; int t;
-int ans;
-a = 98;
-b = 2;
-c = 6;
-num = 1;
-cha = 1;
-t = 0;
-
-repeat {
-	t = t + 1;
-	num = num + cha;
-	if (t < 5) {
-		cha = cha * b;
-	} else {
-		cha += cha + c;
+/# I know you are here to kill me.
+void min(void){
+	if (arr[g]) {
+		killed = me; */
+		killer = you;
+		b =/ b + 2;
+		if(3 < 2){
+			return;
+		}
+/* Shoot, coward, you are only going to kill a man.*/
+		x = 5;
+		b = u * 123;
+		break;
+		/*this is wrong *
+		b = b - 1;
 	}
-} until (num < a)
-
-ans = f(t);
-break;
+	return;
 }
